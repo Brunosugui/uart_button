@@ -1,9 +1,5 @@
 /*
   Button
-
-  Turns on and off a light emitting diode(LED) connected to digital pin 13,
-  when pressing a pushbutton attached to pin 2.
-
   The circuit:
   - LED attached from pin 13 to ground
   - pushbutton attached to pin 2 from +5V
@@ -12,19 +8,17 @@
   - Note: on most Arduinos there is already an LED on the board
     attached to pin 13.
 
-  created 2005
-  by DojoDave <http://www.0j0.org>
-  modified 30 Aug 2011
-  by Tom Igoe
-
-  This example code is in the public domain.
-
-  http://www.arduino.cc/en/Tutorial/Button
 */
+//#define ESP8266 1
 
 // constants won't change. They're used here to set pin numbers:
+#ifdef ESP8266
+const int buttonPin = 0;     // the number of the pushbutton pin
+const int ledPin =  2;      // the number of the LED pin
+#else
 const int buttonPin = 2;     // the number of the pushbutton pin
 const int ledPin =  13;      // the number of the LED pin
+#endif
 
 // variables will change:
 int buttonState = 0;         // variable for reading the pushbutton status
@@ -37,7 +31,7 @@ void setup() {
   pinMode(ledPin, OUTPUT);
   // initialize the pushbutton pin as an input:
   pinMode(buttonPin, INPUT);
-  Serial.begin(9600);
+  Serial.begin(115200);
   inputString.reserve(200);
 }
 
@@ -46,28 +40,23 @@ void loop() {
   buttonState = digitalRead(buttonPin);
 
   // check if the pushbutton is pressed. If it is, the buttonState is HIGH:
-  if (buttonState == HIGH && lastButtonState == LOW) { 
-    Serial.println("led");
-  } 
+  if (buttonState == LOW && lastButtonState == HIGH) { 
+    Serial.println("led\n");
+  }
 
   lastButtonState = buttonState;
 
    if (stringComplete) {
-    if(inputString.equals("led")){
-    digitalWrite(ledPin, HIGH);  
+    if(inputString.equals("led\n")){
+      digitalWrite(ledPin, HIGH);  
+    }else{
+      digitalWrite(ledPin, LOW);
     }
     // clear the string:
     inputString = "";
     stringComplete = false;
   }
-}
 
-/*
-  SerialEvent occurs whenever a new data comes in the hardware serial RX. This
-  routine is run between each time loop() runs, so using delay inside loop can
-  delay response. Multiple bytes of data may be available.
-*/
-void serialEvent() {
   while (Serial.available()) {
     // get the new byte:
     char inChar = (char)Serial.read();
